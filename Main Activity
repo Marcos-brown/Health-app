@@ -1,0 +1,46 @@
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        setupBottomNavigation()
+    }
+    
+    private fun setupBottomNavigation() {
+        val navView: BottomNavigationView = binding.bottomNav
+        val navController = findNavController(R.id.nav_host_fragment)
+        
+        navView.setupWithNavController(navController)
+        navView.itemIconTintList = null // For colored icons
+        
+        // Handle navigation changes
+        navView.setOnItemSelectedListener { item ->
+            when(item.itemId) {
+                R.id.navigation_telemedicine -> {
+                    navController.navigate(R.id.telemedicineFragment)
+                    true
+                }
+                R.id.navigation_emergency -> {
+                    navController.navigate(R.id.emergencyFragment)
+                    true
+                }
+                R.id.navigation_medication -> {
+                    navController.navigate(R.id.medicationFragment)
+                    true
+                }
+                R.id.navigation_health_records -> {
+                    navController.navigate(R.id.healthRecordsFragment)
+                    true
+                }
+                R.id.navigation_wellness -> {
+                    navController.navigate(R.id.wellnessFragment)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+}
