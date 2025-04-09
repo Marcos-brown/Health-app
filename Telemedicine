@@ -1,0 +1,50 @@
+class TelemedicineFragment : Fragment() {
+    private lateinit var viewModel: TelemedicineViewModel
+    
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding = FragmentTelemedicineBinding.inflate(inflater, container, false)
+        
+        setupViewModel()
+        setupUI(binding)
+        
+        return binding.root
+    }
+    
+    private fun setupViewModel() {
+        viewModel = ViewModelProvider(this).get(TelemedicineViewModel::class.java)
+    }
+    
+    private fun setupUI(binding: FragmentTelemedicineBinding) {
+        // Video call button
+        binding.btnVideoCall.setOnClickListener {
+            viewModel.startVideoConsultation()
+        }
+        
+        // Voice call button
+        binding.btnVoiceCall.setOnClickListener {
+            viewModel.startVoiceConsultation()
+        }
+        
+        // Text chat button
+        binding.btnTextChat.setOnClickListener {
+            viewModel.startTextConsultation()
+        }
+        
+        // Observe consultation state
+        viewModel.consultationState.observe(viewLifecycleOwner) { state ->
+            when(state) {
+                is ConsultationState.Connected -> showConsultationUI(state.consultationType)
+                is ConsultationState.Disconnected -> showDisconnectedUI()
+                is ConsultationState.Error -> showError(state.message)
+            }
+        }
+    }
+    
+    private fun showConsultationUI(type: ConsultationType) {
+        // Show appropriate consultation UI based on type
+    }
+}
