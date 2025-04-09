@@ -1,0 +1,81 @@
+[3:18 PM, 4/9/2025] .: class OfflineManager(context: Context) {
+    private val sharedPrefs = context.getSharedPreferences("HealthConnectPrefs", Context.MODE_PRIVATE)
+    private val gson = Gson()
+    
+    fun saveData(key: String, data: Any) {
+        val json = gson.toJson(data)
+        sharedPrefs.edit().putString(key, json).apply()
+    }
+    
+    fun <T> getData(key: String, type: Class<T>): T? {
+        val json = sharedPrefs.getString(key, null)
+        return gson.fromJson(json, type)
+    }
+    
+    fun cacheFirstAidInstructions(instructions: List<FirstAidInstruction>) {
+        saveData("first_aid_instructions", instructions)
+    }
+    
+    fun getCachedFirstAidInstructions(): List<FirstAidInstruction>? {
+        return getData("first_aid_instructions", Array<FirstAidInstruction>::class.java)?.toList()
+    }
+    
+    // Add more specific caching methods as needed
+}
+[3:20 PM, 4/9/2025] .: class LocaleHelper {
+    companion object {
+        fun setLocale(context: Context, languageCode: String): Context {
+            val locale = Locale(languageCode)
+            Locale.setDefault(locale)
+            
+            val resources = context.resources
+            val configuration = Configuration(resources.configuration)
+            configuration.setLocale(locale)
+            
+            return context.createConfigurationContext(configuration)
+        }
+        
+        fun getCurrentLanguage(context: Context): String {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            return prefs.getString("selected_language", "en") ?: "en"
+        }
+    }
+}
+
+class LanguageActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLanguageBinding
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityLanguageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        setupLanguageList()
+    }
+    
+    private fun setupLanguageList() {
+        val languages = listOf(
+            Language("English", "en"),
+            Language("Español", "es"),
+            Language("Français", "fr"),
+            // Add more supported languages
+        )
+        
+        val adapter = LanguageAdapter(languages) { language ->
+            setAppLanguage(language.code)
+        }
+        
+        binding.languagesRecyclerView.adapter = adapter
+        binding.languagesRecyclerView.layoutManager = LinearLayoutManager(this)
+    }
+    
+    private fun setAppLanguage(languageCode: String) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.edit().putString("selected_language", languageCode).apply()
+        
+        LocaleHelper.setLocale(this, languageCode)
+        
+        // Restart activity to apply language changes
+        recreate()
+    }
+}
