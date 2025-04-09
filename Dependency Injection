@@ -1,0 +1,29 @@
+val appModule = module {
+    // ViewModels
+    viewModel { TelemedicineViewModel(get(), get()) }
+    viewModel { EmergencyViewModel(get(), get()) }
+    viewModel { MedicationViewModel(get(), get()) }
+    
+    // Repositories
+    single<TelemedicineRepository> { TelemedicineRepositoryImpl(get(), get()) }
+    single<EmergencyRepository> { EmergencyRepositoryImpl(get(), get()) }
+    single<MedicationRepository> { MedicationRepositoryImpl(get(), get()) }
+    
+    // Data sources
+    single<TelemedicineDataSource> { TelemedicineDataSourceImpl(get()) }
+    single<EmergencyDataSource> { EmergencyDataSourceImpl(get()) }
+    single<MedicationDataSource> { MedicationDataSourceImpl(get()) }
+    
+    // Other dependencies
+    single { OfflineManager(get()) }
+    single { provideSharedPreferences(get()) }
+    single { provideGson() }
+}
+
+fun provideSharedPreferences(context: Context): SharedPreferences {
+    return context.getSharedPreferences("HealthConnectPrefs", Context.MODE_PRIVATE)
+}
+
+fun provideGson(): Gson {
+    return GsonBuilder().create()
+}
