@@ -1,0 +1,66 @@
+class EmergencyFragment : Fragment() {
+    private lateinit var binding: FragmentEmergencyBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentEmergencyBinding.inflate(inflater, container, false)
+        
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        
+        setupEmergencyButtons()
+        
+        return binding.root
+    }
+    
+    private fun setupEmergencyButtons() {
+        binding.btnEmergencyCall.setOnClickListener {
+            requestEmergencyHelp()
+        }
+        
+        binding.btnFirstAidGuide.setOnClickListener {
+            showFirstAidInstructions()
+        }
+        
+        binding.btnNearbyFacilities.setOnClickListener {
+            showNearbyHealthFacilities()
+        }
+    }
+    
+    private fun requestEmergencyHelp() {
+        // Get current location
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    if (location != null) {
+                        val latLng = "${location.latitude},${location.longitude}"
+                        sendEmergencyAlert(latLng)
+                    } else {
+                        showLocationError()
+                    }
+                }
+        } else {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST
+            )
+        }
+    }
+    
+    private fun sendEmergencyAlert(location: String) {
+        // Send emergency alert with location to server
+        // Show confirmation
+    }
+    
+    private fun showFirstAidInstructions() {
+        val action = EmergencyFragmentDirections.actionEmergencyFragmentToFirstAidFragment()
+        findNavController().navigate(action)
+    }
+}
