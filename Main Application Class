@@ -1,0 +1,14 @@
+class HealthConnectApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        // Initialize dependency injection, analytics, etc.
+        initKoin()
+    }
+    
+    private fun initKoin() {
+        startKoin {
+            androidContext(this@HealthConnectApp)
+            modules(appModule)
+        }
+    }
+}
